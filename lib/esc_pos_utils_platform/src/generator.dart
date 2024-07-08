@@ -377,18 +377,18 @@ class Generator {
 
   List<int> textPos(
     String text,
-    double fromPos, {
+    int fromPos, {
     PosStyles styles = const PosStyles(),
     int? charLength,
     int? maxCharsPerLine,
   }) {
     List<int> bytes = [];
     double charWidth = _getCharWidth(styles, maxCharsPerLine: maxCharsPerLine);
-    double actualFromPos = fromPos;
+    double actualFromPos = fromPos.toDouble();
     double actualToPos = charLength != null
         ? actualFromPos + (charLength * charWidth)
         : actualFromPos;
-    var textInfo = _textInfo(text, styles, maxCharsPerLine: maxCharsPerLine);
+    var textInfo = getTextInfo(text, styles, maxCharsPerLine: maxCharsPerLine);
     var textLen = textInfo.textLen;
 
     // Align within the specified area if charLength is provided
@@ -400,7 +400,7 @@ class Generator {
             actualFromPos + (actualToPos - actualFromPos) / 2 - textLen / 2;
       }
       if (actualFromPos < 0) {
-        actualFromPos = fromPos;
+        actualFromPos = fromPos.toDouble();
       }
     }
 
@@ -1047,7 +1047,7 @@ class Generator {
     return bytes;
   }
 
-  TextInfo _textInfo(String text, PosStyles styles, {int? maxCharsPerLine}) {
+  TextInfo getTextInfo(String text, PosStyles styles, {int? maxCharsPerLine}) {
     final list = _getLexemes(text);
     final List<String> lexemes = list[0];
     final List<bool> isLexemeChinese = list[1];
