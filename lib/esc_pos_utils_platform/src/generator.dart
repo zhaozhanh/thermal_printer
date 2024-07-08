@@ -345,6 +345,10 @@ class Generator {
     return bytes;
   }
 
+  double charWidth(PosStyles styles, {int? maxCharsPerLine}) {
+    return _getCharWidth(styles);
+  }
+
   List<int> text(
     String text, {
     PosStyles styles = const PosStyles(),
