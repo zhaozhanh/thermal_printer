@@ -375,6 +375,49 @@ class Generator {
     return bytes;
   }
 
+  List<int> textPos(
+    String text,
+    double fromPos, {
+    PosStyles styles = const PosStyles(),
+    int? charLength,
+    int? maxCharsPerLine,
+  }) {
+    List<int> bytes = [];
+    double charWidth = _getCharWidth(styles, maxCharsPerLine: maxCharsPerLine);
+    double actualFromPos = fromPos;
+    double actualToPos = charLength != null
+        ? actualFromPos + (charLength * charWidth)
+        : actualFromPos;
+    var textInfo = _textInfo(text, styles, maxCharsPerLine: maxCharsPerLine);
+    var textLen = textInfo.textLen;
+
+    // Align within the specified area if charLength is provided
+    if (charLength != null) {
+      if (styles.align == PosAlign.right) {
+        actualFromPos = actualToPos - textLen;
+      } else if (styles.align == PosAlign.center) {
+        actualFromPos =
+            actualFromPos + (actualToPos - actualFromPos) / 2 - textLen / 2;
+      }
+      if (actualFromPos < 0) {
+        actualFromPos = fromPos;
+      }
+    }
+
+    final hexStr = actualFromPos.round().toRadixString(16).padLeft(3, '0');
+    final hexPair = HEX.decode(hexStr);
+
+    // Position
+    bytes += Uint8List.fromList(
+      List.from(cPos.codeUnits)..addAll([hexPair[1], hexPair[0]]),
+    );
+
+    bytes += setStyles(styles, isKanji: true);
+
+    bytes += textInfo.textBytes;
+    return bytes;
+  }
+
   /// Skips [n] lines
   ///
   /// Similar to [feed] but uses an alternative command
@@ -1003,6 +1046,26 @@ class Generator {
     bytes += emptyLines(linesAfter + 1);
     return bytes;
   }
+
+  TextInfo _textInfo(String text, PosStyles styles, {int? maxCharsPerLine}) {
+    final list = _getLexemes(text);
+    final List<String> lexemes = list[0];
+    final List<bool> isLexemeChinese = list[1];
+    double totalTextLength = 0;
+    List<int> allEncodedTexts = [];
+
+    for (var i = 0; i < lexemes.length; ++i) {
+      final Uint8List encodedLexeme =
+          _encode(lexemes[i], isKanji: isLexemeChinese[i]);
+      allEncodedTexts.addAll(encodedLexeme);
+      final double charWidth =
+          _getCharWidth(styles, maxCharsPerLine: maxCharsPerLine);
+      final int textLength = (encodedLexeme.length * charWidth).round();
+      totalTextLength += textLength;
+    }
+
+    return TextInfo(totalTextLength, Uint8List.fromList(allEncodedTexts));
+  }
   // ************************ (end) Internal command generators ************************
 
   /// Draw the image [src] onto the image [dst].
@@ -1058,4 +1121,11 @@ class Generator {
 
     return dst;
   }
+}
+
+class TextInfo {
+  TextInfo(this.textLen, this.textBytes);
+
+  final double textLen;
+  final Uint8List textBytes;
 }
