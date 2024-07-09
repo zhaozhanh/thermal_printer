@@ -20,11 +20,12 @@ class PosColumn {
     this.width = 2,
     this.styles = const PosStyles(),
   }) {
-    if (width < 1 || width > 12) {
-      throw Exception('Column width must be between 1..12');
+    if (width < 1 || width > 16) {
+      throw Exception('Column width must be between 1..16');
     }
     if (text.length > 0 && textEncoded != null && textEncoded!.length > 0) {
-      throw Exception('Only one parameter - text or textEncoded - should be passed');
+      throw Exception(
+          'Only one parameter - text or textEncoded - should be passed');
     }
   }
 

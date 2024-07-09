@@ -18,6 +18,7 @@ class Generator {
   Generator(this._paperSize, this._profile, {this.spaceBetweenRows = 5});
 
   // Ticket config
+  final totalPosColumnWidth = 16;
   final PaperSize _paperSize;
   CapabilityProfile _profile;
   int? _maxCharsPerLine;
@@ -46,7 +47,7 @@ class Generator {
 
   double _colIndToPosition(int colInd) {
     final int width = _paperSize.width;
-    return colInd == 0 ? 0 : (width * colInd / 12 - 1);
+    return colInd == 0 ? 0 : (width * colInd / totalPosColumnWidth - 1);
   }
 
   int _getCharsPerLine(PosStyles styles, int? maxCharsPerLine) {
@@ -649,13 +650,15 @@ class Generator {
 
   /// Print a row.
   ///
-  /// A row contains up to 12 columns. A column has a width between 1 and 12.
-  /// Total width of columns in one row must be equal 12.
+  /// A row contains up to totalPosColumnWidth columns. A column has a width between 1 and totalPosColumnWidth.
+  /// Total width of columns in one row must be equal totalPosColumnWidth.
   List<int> row(List<PosColumn> cols) {
     List<int> bytes = [];
-    final isSumValid = cols.fold(0, (int sum, col) => sum + col.width) == 12;
+    final isSumValid =
+        cols.fold(0, (int sum, col) => sum + col.width) == totalPosColumnWidth;
     if (!isSumValid) {
-      throw Exception('Total columns width must be equal to 12');
+      throw Exception(
+          'Total columns width must be equal to $totalPosColumnWidth');
     }
     bool isNextRow = false;
     List<PosColumn> nextRow = <PosColumn>[];
@@ -974,13 +977,13 @@ class Generator {
   // ************************ (end) Internal command generators ************************
   /// Generic print for internal use
   ///
-  /// [colInd] range: 0..11. If null: do not define the position
+  /// [colInd] range: 0..15. If null: do not define the position
   List<int> _text(
     Uint8List textBytes, {
     PosStyles styles = const PosStyles(),
     int? colInd = 0,
     bool isKanji = false,
-    int colWidth = 12,
+    int colWidth = 16,
     int? maxCharsPerLine,
   }) {
     List<int> bytes = [];
@@ -990,7 +993,7 @@ class Generator {
       double fromPos = _colIndToPosition(colInd);
 
       // Align
-      if (colWidth != 12) {
+      if (colWidth != totalPosColumnWidth) {
         // Update fromPos
         final double toPos =
             _colIndToPosition(colInd + colWidth) - spaceBetweenRows;
