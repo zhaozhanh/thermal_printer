@@ -766,10 +766,10 @@ class Generator {
 
   int _spltChineseCharacters(int maxCharactersNb, String text) {
     // Split text into multiple lines if it too long
-    int counter = 0;
+    double counter = 0;
     int splitPos = 0;
     for (int p = 0; p < text.length; ++p) {
-      final int w = _isChinese(text[p]) ? 2 : 1;
+      final double w = _isChinese(text[p]) ? 2.4 : 1;
       if (counter + w >= maxCharactersNb) {
         break;
       }
