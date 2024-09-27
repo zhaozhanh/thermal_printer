@@ -32,9 +32,9 @@ class Generator {
   // ************************ Internal helpers ************************
   int _getMaxCharsPerLine(PosFontType? font) {
     if (_paperSize == PaperSize.mm58) {
-      return (font == null || font == PosFontType.fontA) ? 32 : 42;
+      return (font == null || font == PosFontType.fontA) ? 33 : 44;
     } else {
-      return (font == null || font == PosFontType.fontA) ? 48 : 64;
+      return (font == null || font == PosFontType.fontA) ? 49 : 66;
     }
   }
 
@@ -769,7 +769,7 @@ class Generator {
     double counter = 0;
     int splitPos = 0;
     for (int p = 0; p < text.length; ++p) {
-      final double w = _isChinese(text[p]) ? 2.35 : 1;
+      final double w = _isChinese(text[p]) ? 2.35 : 0.95;
       if (counter + w >= maxCharactersNb) {
         break;
       }
