@@ -769,7 +769,7 @@ class Generator {
     double counter = 0;
     int splitPos = 0;
     for (int p = 0; p < text.length; ++p) {
-      final double w = _isChinese(text[p]) ? 2.4 : 1;
+      final double w = _isChinese(text[p]) ? 2.35 : 1;
       if (counter + w >= maxCharactersNb) {
         break;
       }
